@@ -46,7 +46,7 @@ if uploaded_file is not None:
 
             # Fraud Table
             if not frauds.empty:
-                col1, col2, col3 = st.columns([0.5, 2, 0.5])
+                col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
                     st.subheader("🚨 Fraudulent Transactions")
                     st.dataframe(frauds[['transaction_id', 'amount', 'seller_id', 'payment_method']])
@@ -59,7 +59,7 @@ if uploaded_file is not None:
             # RWSI Leaderboard
             rwsi_df = get_rwsi_leaderboard()
             if not rwsi_df.empty:
-                col1, col2, col3 = st.columns([0.5, 2, 0.5])
+                col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
                     st.subheader("📊 Risk-Weighted Seller Index (RWSI)")
                     st.markdown("Top sellers with high fraud rates. A higher RWSI means higher risk.")
@@ -67,7 +67,7 @@ if uploaded_file is not None:
 
             # Full Results (optional)
             with st.expander("📜 See full results"):
-                col1, col2, col3 = st.columns([0.5, 2, 0.5])
+                col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
                     st.dataframe(result_df)
 
