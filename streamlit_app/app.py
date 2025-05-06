@@ -14,11 +14,21 @@ from utils import process_batch, get_rwsi_leaderboard
 
 # App Config
 st.set_page_config(page_title="🛡️ FraudShield Dashboard", layout="wide")
-st.title("🛡️ FraudShield: Real-Time E-Commerce Fraud Detection")
-st.markdown("Detect fraudulent transactions in real-time and track seller risk via **RWSI (Risk-Weighted Seller Index)**.")
 
-# File Upload
-uploaded_file = st.file_uploader("📂 Upload a transaction CSV file", type=['csv'])
+# Centered Header
+st.markdown(
+    "<h1 style='text-align: center;'>🛡️ FraudShield: Real-Time E-Commerce Fraud Detection</h1>",
+    unsafe_allow_html=True
+)
+st.markdown(
+    "<div style='text-align: center;'>Detect fraudulent transactions in real-time and track seller risk via <b>RWSI (Risk-Weighted Seller Index)</b>.</div><br>",
+    unsafe_allow_html=True
+)
+
+# Centered file uploader
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    uploaded_file = st.file_uploader("📂 Upload a transaction CSV file", type=['csv'])
 
 if uploaded_file is not None:
     try:
@@ -30,35 +40,46 @@ if uploaded_file is not None:
             with st.spinner("🔍 Analyzing transactions..."):
                 result_df = process_batch(df)
 
-            # Display results
+            # Display result summary
             frauds = result_df[result_df['predicted_fraud'] == 1]
             st.success(f"✅ {len(frauds)} fraudulent transactions detected out of {len(result_df)} total.")
 
+            # Fraud Table
             if not frauds.empty:
-                st.subheader("🚨 Fraudulent Transactions")
-                st.dataframe(frauds[['transaction_id', 'amount', 'seller_id', 'payment_method']])
+                col1, col2, col3 = st.columns([0.5, 2, 0.5])
+                with col2:
+                    st.subheader("🚨 Fraudulent Transactions")
+                    st.dataframe(frauds[['transaction_id', 'amount', 'seller_id', 'payment_method']])
 
                 # Save fraud log
                 os.makedirs('fraud_logs', exist_ok=True)
                 log_path = 'fraud_logs/fraud_batch.csv'
                 frauds.to_csv(log_path, mode='a', index=False, header=not os.path.exists(log_path))
 
-            # Show RWSI leaderboard
+            # RWSI Leaderboard
             rwsi_df = get_rwsi_leaderboard()
             if not rwsi_df.empty:
-                st.subheader("📊 Risk-Weighted Seller Index (RWSI)")
-                st.markdown("Top sellers with high fraud rates. A higher RWSI means higher risk.")
-                st.dataframe(rwsi_df)
+                col1, col2, col3 = st.columns([0.5, 2, 0.5])
+                with col2:
+                    st.subheader("📊 Risk-Weighted Seller Index (RWSI)")
+                    st.markdown("Top sellers with high fraud rates. A higher RWSI means higher risk.")
+                    st.dataframe(rwsi_df)
 
-            # Optional: Full results
+            # Full Results (optional)
             with st.expander("📜 See full results"):
-                st.dataframe(result_df)
+                col1, col2, col3 = st.columns([0.5, 2, 0.5])
+                with col2:
+                    st.dataframe(result_df)
 
-            # Download fraud logs
+            # Download Fraud Log Button
             if os.path.exists('fraud_logs/fraud_batch.csv'):
                 with open('fraud_logs/fraud_batch.csv', 'rb') as f:
-                    st.download_button("📥 Download Fraud Logs", f, file_name="fraud_log.csv")
+                    col1, col2, col3 = st.columns([1, 2, 1])
+                    with col2:
+                        st.download_button("📥 Download Fraud Logs", f, file_name="fraud_log.csv")
+
     except Exception as e:
         st.error(f"❌ Error processing file: {e}")
+
 else:
     st.info("👆 Upload a CSV file to begin fraud detection.")
