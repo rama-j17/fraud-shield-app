@@ -10,9 +10,11 @@ Original file is located at
 import pandas as pd
 import joblib
 from collections import defaultdict
+import xgboost as xgb
 
 # Load model and encoders
-model = joblib.load('model/xgb_fraud_model.json')
+model = xgb.XGBClassifier()
+model.load_model("model/xgb_fraud_model.json")
 le_dict = joblib.load('model/label_encoders.pkl')
 seller_stats = defaultdict(lambda: {'total': 0, 'fraud': 0})
 
